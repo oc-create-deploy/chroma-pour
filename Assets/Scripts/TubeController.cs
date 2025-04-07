@@ -20,7 +20,9 @@ public class TubeController : MonoBehaviour
     private AudioSource audioSource; // 🎵 音效播放组件
 
     private Stack<Color> liquidStack = new Stack<Color>(); // 用于存储当前液体的堆栈
+    public List<float> liquidLevels = new List<float>();  // 存储每层液体的显示比例 (0~1)
     private Vector3 originalPosition; // 记录初始位置
+    private Material waterMaterial;
 
     void Start()
     {
@@ -134,6 +136,7 @@ public class TubeController : MonoBehaviour
         // 先清空当前数据
         currentLiquids.Clear();
         liquidStack.Clear(); // ✅ 关键！保证 liquidStack 被正确填充
+        liquidLevels.Clear();
 
         for (int i = 0; i < liquidSlots.Count; i++)
         {
@@ -145,6 +148,7 @@ public class TubeController : MonoBehaviour
 
                 // ✅ 重要！同步更新 liquidStack（从底部到顶部）
                 liquidStack.Push(liquidSlots[i].color);
+                liquidLevels.Add(1.0f);  // 默认全部填满
             }
             else
             {
@@ -154,7 +158,7 @@ public class TubeController : MonoBehaviour
             }
         }
 
-        Debug.Log("当前瓶子 " + gameObject.name + " 的液体槽数量：" + liquidSlots.Count + "，当前液体数量：" + liquidStack.Count);
+        //Debug.Log("当前瓶子 " + gameObject.name + " 的液体槽数量：" + liquidSlots.Count + "，当前液体数量：" + liquidStack.Count);
     }
 
     // 清空瓶子，使所有液体槽显示为空
@@ -255,6 +259,7 @@ public class TubeController : MonoBehaviour
             liquidStack.Pop(); // 移除当前瓶子顶层水
             // **更新目标瓶的水**
             targetTube.liquidStack.Push(pouringColor);
+            targetTube.liquidLevels.Add(1.0f); // ⚡ 默认加满的液体层
 
             // **更新 UI**
             UpdateLiquidDisplay();
@@ -327,5 +332,7 @@ public class TubeController : MonoBehaviour
             liquidSlots[index].color = liquidArray[i]; // 从底部开始填充
             index++;
         }
+
+        //Debug.Log("[TubeControl]liquidLevels:"+liquidLevels);
     }
 }

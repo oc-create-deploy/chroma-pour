@@ -196,6 +196,7 @@ MonoBehaviour:
   maxLayers: 4
   maxCapacity: 4
   pourWaterSound: {fileID: 8300000, guid: be696a3cba21a0847870a6968140f0c1, type: 3}
+  liquidLevels: []
 --- !u!70 &3302253345713014210
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -391,7 +392,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: ce9149b356a95054b9303d80c34ddc29, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -524,21 +525,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &446493459227873973
-Transform:
+--- !u!224 &446493459227873973
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7188311636696594106}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0277, y: -0.7098, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.8750387, y: 0.9528491, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5920284662231408954}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -0.0277, y: -0.7098}
+  m_SizeDelta: {x: 1.09, y: 1.2}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &935357692101662558
 SpriteRenderer:
   m_ObjectHideFlags: 0
