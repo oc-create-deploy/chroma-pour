@@ -23,6 +23,22 @@ jobs:
         with:
           lfs: true
 
+      - name: Free disk space for Unity and iOS support
+        shell: bash
+        run: |
+          for path in \
+            /usr/local/lib/android \
+            /usr/share/dotnet \
+            /opt/ghc \
+            /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL; do
+            if [ -d "$path" ]; then
+              sudo find "$path" -mindepth 1 -delete
+            fi
+          done
+          docker system prune --all --force >/dev/null 2>&1 || true
+          df -h /
+
       - name: Install Unity CLI
         shell: bash
         run: |
