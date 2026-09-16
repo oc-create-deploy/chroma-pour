@@ -17,9 +17,7 @@ permissions:
 
 jobs:
   archive-and-upload:
-    # Unity 2022.3.7f1's deferred IL2CPP build cannot discover the iOS 26 SDK
-    # bundled with Xcode 26. Xcode 16.4 remains compatible with this Unity LTS
-    # export and is available on the macOS 15 runner.
+    # Build with Xcode 16.4 and the matching iOS 18 SDK accepted by Apple.
     runs-on: macos-15
     timeout-minutes: 45
     env:

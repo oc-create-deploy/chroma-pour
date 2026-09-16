@@ -78,8 +78,8 @@ jobs:
       - name: Install Unity Editor and iOS module
         shell: bash
         run: >-
-          "$HOME/.local/bin/unity" install 2022.3.7f1
-          -c b16b3b16c7a0
+          "$HOME/.local/bin/unity" install 2022.3.74f1
+          -c f81e190e19ca
           -m ios
           --format github
 
@@ -87,7 +87,7 @@ jobs:
         shell: bash
         run: >-
           "$HOME/.local/bin/unity" build .
-          --editor-version 2022.3.7f1
+          --editor-version 2022.3.74f1
           --target iOS
           --execute-method BuildScript.BuildIos
           --timeout 3600
