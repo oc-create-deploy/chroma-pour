@@ -17,7 +17,10 @@ permissions:
 
 jobs:
   archive-and-upload:
-    runs-on: macos-26
+    # Unity 2022.3.7f1's deferred IL2CPP build cannot discover the iOS 26 SDK
+    # bundled with Xcode 26. Xcode 16.4 remains compatible with this Unity LTS
+    # export and is available on the macOS 15 runner.
+    runs-on: macos-15
     timeout-minutes: 45
     env:
       APP_BUNDLE_ID: com.play.watersortpuzzle
