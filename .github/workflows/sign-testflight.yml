@@ -17,8 +17,8 @@ permissions:
 
 jobs:
   archive-and-upload:
-    # Build with Xcode 16.4 and the matching iOS 18 SDK accepted by Apple.
-    runs-on: macos-15
+    # App Store Connect now requires the iOS 26 SDK shipped with Xcode 26.
+    runs-on: macos-26
     timeout-minutes: 45
     env:
       APP_BUNDLE_ID: com.play.watersortpuzzle
