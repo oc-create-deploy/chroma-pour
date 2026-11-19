@@ -104,7 +104,7 @@ for turn,(i,j) in enumerate(path):
     if turn%8==0:capture(f'05-progress-{turn:02}')
 assert solved(board()),'Native puzzle not solved';capture('06-solved')
 assert any(i['kind']=='text' and 'Clear' in i.get('text','') for i in state()['items']),'Win panel not visible'
-tap('Refresh');time.sleep(2)
+tap('Button');time.sleep(2) # Scene ResetGame action is an icon-only Button.
 assert sum(map(len,board()))==liquid_total and not solved(board()),'Refresh did not create new puzzle'
 capture('07-reset')
 (out/'result.json').write_text(json.dumps({'nativePours':len(path),'invalidPourConserved':True,'relaunchPersisted':True,'solved':True,'reset':True},indent=2))
