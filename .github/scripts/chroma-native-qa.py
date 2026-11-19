@@ -87,7 +87,7 @@ def await_board(expected,label):
         if board()==expected:return
         time.sleep(.5)
     capture('failure-'+label);raise AssertionError(('Native pour mismatch',label,expected,board()))
-capture('01-board');initial=board();assert len(initial)==6 and sum(map(len,initial))==16,initial
+capture('01-board');initial=board();liquid_total=sum(map(len,initial));palette=set(c for t in initial for c in t);assert len(initial)>=len(palette)+2 and liquid_total==4*len(palette),initial
 # Full destination is illegal and must conserve every color.
 full=[i for i,t in enumerate(initial) if len(t)==4]
 touch(full[0]);touch(full[1]);time.sleep(2);assert board()==initial,'Illegal pour changed board'
@@ -105,6 +105,6 @@ for turn,(i,j) in enumerate(path):
 assert solved(board()),'Native puzzle not solved';capture('06-solved')
 assert any(i['kind']=='text' and 'Clear' in i.get('text','') for i in state()['items']),'Win panel not visible'
 tap('Refresh');time.sleep(2)
-assert sum(map(len,board()))==16 and not solved(board()),'Refresh did not create new puzzle'
+assert sum(map(len,board()))==liquid_total and not solved(board()),'Refresh did not create new puzzle'
 capture('07-reset')
 (out/'result.json').write_text(json.dumps({'nativePours':len(path),'invalidPourConserved':True,'relaunchPersisted':True,'solved':True,'reset':True},indent=2))
