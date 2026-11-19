@@ -4,6 +4,8 @@ using System.Collections;
 
 public class TubeController : MonoBehaviour
 {
+    public static bool IsPouring { get; private set; }
+    private void OnDisable() { IsPouring = false; }
     // 管子中所有的液体槽，要求在 Inspector 中按从底部到顶部顺序排列
     public List<SpriteRenderer> liquidSlots;
 
@@ -199,6 +201,7 @@ public class TubeController : MonoBehaviour
 
     public void PourWater(TubeController targetTube)
     {
+        if (IsPouring || targetTube == this) return;
         if (!CanPourInto(targetTube))
         {
             // 不能倒水，瓶子回到原始位置
@@ -206,6 +209,7 @@ public class TubeController : MonoBehaviour
             return;
         }
 
+        IsPouring = true;
         StartCoroutine(MoveRotateAndPour(targetTube));
     }
 
@@ -216,70 +220,36 @@ public class TubeController : MonoBehaviour
 
     IEnumerator MoveRotateAndPour(TubeController targetTube)
     {
-        Quaternion originalRotation = transform.rotation; // 记录当前旋转角度
-
-        int initialWaterAmount = liquidStack.Count;  // 记录当前瓶子倒水前的水量
-
-        // 倒水逻辑
-        Color pouringColor = liquidStack.Peek(); // 获取当前瓶子最上层的颜色
-        int pourAmount = 0;
-
-        while (liquidStack.Count > 0 && liquidStack.Peek() == pouringColor && targetTube.liquidStack.Count < maxCapacity)
+        Quaternion rotation = transform.rotation;
+        try
         {
-            liquidStack.Pop(); // 移除当前瓶子顶层水
-            targetTube.liquidStack.Push(pouringColor);
-            pourAmount++;
+            Color color = liquidStack.Peek();
+            int amount = 0;
+            foreach (Color next in liquidStack)
+            {
+                if (next != color) break;
+                amount++;
+            }
+            amount = Mathf.Min(amount, targetTube.maxCapacity - targetTube.liquidStack.Count);
+            Vector3 position = targetTube.transform.position + new Vector3(1.5f, 1.0f, 0);
+            yield return MoveAndRotate(transform, position, Quaternion.Euler(0, 0, 60), 0.35f);
+            if (pourWaterSound != null && audioSource != null) audioSource.PlayOneShot(pourWaterSound);
+            for (int i = 0; i < amount; i++)
+            {
+                targetTube.liquidStack.Push(liquidStack.Pop());
+                UpdateLiquidDisplay();
+                targetTube.UpdateLiquidDisplay();
+                yield return new WaitForSeconds(0.10f);
+            }
+            gm2.Instance.CheckGameOver();
+            yield return MoveAndRotate(transform, originalPosition, rotation, 0.35f);
         }
-
-        // **计算动态倾斜角度**
-        int remainingWater = liquidStack.Count;
-        float tiltAngle = 20f + 70f * (1 - ((float)remainingWater / maxCapacity)); // 水越少，倾斜越大
-        float shiftUp = .5f + 1.5f * (1 - ((float)remainingWater / maxCapacity));
-
-        Vector3 targetPosition = targetTube.transform.position + new Vector3(1.5f, shiftUp, 0); // 目标瓶子的右侧
-        Quaternion targetRotation = Quaternion.Euler(0, 0, tiltAngle);
-
-        // **动画：先移动+旋转到目标**
-        yield return MoveAndRotate(transform, targetPosition, targetRotation, 0.8f);
-
-        // 🎵 播放倒水音效
-        if (pourWaterSound != null && audioSource != null)
+        finally
         {
-            audioSource.PlayOneShot(pourWaterSound);
+            transform.position = originalPosition;
+            transform.rotation = rotation;
+            IsPouring = false;
         }
-
-        // **执行倒水动画**
-        for (int i = 0; i < pourAmount; i++)
-        {
-            liquidStack.Push(pouringColor);
-            targetTube.liquidStack.Pop();
-        }
-        for (int i = 0; i < pourAmount; i++)
-        {
-            liquidStack.Pop(); // 移除当前瓶子顶层水
-            // **更新目标瓶的水**
-            targetTube.liquidStack.Push(pouringColor);
-            targetTube.liquidLevels.Add(1.0f); // ⚡ 默认加满的液体层
-
-            // **更新 UI**
-            UpdateLiquidDisplay();
-            targetTube.UpdateLiquidDisplay();
-
-            yield return new WaitForSeconds(0.15f); // 控制倒水速度
-        }
-
-        // **成功倒水后检查游戏是否结束**
-        gm2.Instance.CheckGameOver();
-
-        // 倒水完成后，平滑返回原位置并恢复旋转
-        yield return MoveAndRotate(transform, originalPosition, originalRotation, 0.5f);
-
-        //yield return new WaitForSeconds(0.8f); // 等待一段时间后再次往回，解决一个bug：当第2次点击太快时，这个动画会未执行完，从而执行其他动画，然后继续走未执行的路径
-        // **判断瓶子是否仍然悬浮在原位置的正上方 0.3 个单位内**
-        //if (transform.position.y - originalPosition.y <= .3f && transform.position.y - originalPosition.y >= 0 && Mathf.Abs(transform.position.x - originalPosition.x)<= .01f)
-        //{
-        //    yield return MoveAndRotate(transform, originalPosition, originalRotation, 0.2f);
-        //}
     }
 
     // **同时移动和旋转**

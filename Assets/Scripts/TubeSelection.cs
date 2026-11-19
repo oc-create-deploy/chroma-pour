@@ -16,6 +16,7 @@ public class TubeSelection : MonoBehaviour
 
     void Update()
     {
+        if (TubeController.IsPouring) return;
         // 🌟 如果不是被选中的瓶子，并且位置偏离原始位置 -> 自动回到原位
         if (selectedTube != this.GetComponent<TubeController>() && selectedTube != null)
         {
@@ -25,6 +26,7 @@ public class TubeSelection : MonoBehaviour
 
     void OnMouseDown()
     {
+        if (TubeController.IsPouring) return;
         Debug.Log("管子被点击了：" + gameObject.name);
         //Debug.Log(selectedTube);
         TubeController clickedTube = GetComponent<TubeController>();
@@ -53,6 +55,8 @@ public class TubeSelection : MonoBehaviour
         else
         {
             // 倒水
+            selectedTube.GetComponent<TubeSelection>().StopAllCoroutines();
+            StopAllCoroutines();
             selectedTube.PourWater(clickedTube);
             // 取消选中
             selectedTube = null;

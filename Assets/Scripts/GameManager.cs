@@ -43,8 +43,10 @@ public class GameManager : MonoBehaviour
         int pourCount = source.GetTopSameColorCount(out sourceColor);
 
         if (!sourceColor.HasValue)
+        {
             Debug.Log("无法倒水");
             return;
+        }
 
         // 判断目标管子的顶部液体颜色（如果有的话）
         int emptySlots = target.GetEmptySlotCount();

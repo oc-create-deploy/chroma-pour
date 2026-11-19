@@ -67,6 +67,7 @@ public class gm2 : MonoBehaviour
 
     public void ResetGame()
     {
+        if (TubeController.IsPouring) return;
         if (audioSource != null) // 🎵 播放音效
         {
             audioSource.Play();
