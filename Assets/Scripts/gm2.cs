@@ -41,13 +41,14 @@ public class gm2 : MonoBehaviour
         {
             var board=JsonUtility.FromJson<SavedBoard>(PlayerPrefs.GetString(SaveKey,""));
             if(board==null || board.tubes==null || board.tubes.Count!=tubes.Count) return false;
-            var counts=new Dictionary<Color,int>();
+            var counts=new Dictionary<string,int>();
+            var palette=new HashSet<string>();foreach(var color in liquidColors) palette.Add(ColorUtility.ToHtmlStringRGB(color));
             foreach(var saved in board.tubes)
             {
                 if(saved==null || saved.colors==null || saved.colors.Count>capacity) return false;
-                foreach(var color in saved.colors) {if(System.Array.IndexOf(liquidColors,color)<0) return false;if(!counts.ContainsKey(color)) counts[color]=0;counts[color]++;}
+                foreach(var color in saved.colors) {string key=ColorUtility.ToHtmlStringRGB(color);if(!palette.Contains(key)) return false;if(!counts.ContainsKey(key)) counts[key]=0;counts[key]++;}
             }
-            foreach(var color in liquidColors) if(!counts.ContainsKey(color) || counts[color]!=capacity) return false;
+            foreach(var key in palette) if(!counts.ContainsKey(key) || counts[key]!=capacity) return false;
             for(int i=0;i<tubes.Count;i++) tubes[i].FillTube(board.tubes[i].colors);
             CheckGameOver();return true;
         } catch(System.Exception) {return false;}
