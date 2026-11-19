@@ -249,6 +249,7 @@ public class TubeController : MonoBehaviour
             transform.position = originalPosition;
             transform.rotation = rotation;
             IsPouring = false;
+            if(gm2.Instance!=null) gm2.Instance.SaveBoard();
         }
     }
 

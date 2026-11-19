@@ -25,9 +25,37 @@ public class gm2 : MonoBehaviour
         Instance = this; // 让其他类可以访问 GameManager
     }
 
+    [System.Serializable] public class SavedTube { public List<Color> colors=new List<Color>(); }
+    [System.Serializable] public class SavedBoard { public List<SavedTube> tubes=new List<SavedTube>(); }
+    private const string SaveKey="chroma.board.v1";
+    public void SaveBoard()
+    {
+        if(TubeController.IsPouring) return;
+        var board=new SavedBoard();
+        foreach(var tube in tubes) {var colors=tube.GetCurrentColors();colors.Reverse();board.tubes.Add(new SavedTube{colors=colors});}
+        PlayerPrefs.SetString(SaveKey,JsonUtility.ToJson(board));PlayerPrefs.Save();
+    }
+    private bool RestoreBoard()
+    {
+        try
+        {
+            var board=JsonUtility.FromJson<SavedBoard>(PlayerPrefs.GetString(SaveKey,""));
+            if(board==null || board.tubes==null || board.tubes.Count!=tubes.Count) return false;
+            var counts=new Dictionary<Color,int>();
+            foreach(var saved in board.tubes)
+            {
+                if(saved==null || saved.colors==null || saved.colors.Count>capacity) return false;
+                foreach(var color in saved.colors) {if(System.Array.IndexOf(liquidColors,color)<0) return false;if(!counts.ContainsKey(color)) counts[color]=0;counts[color]++;}
+            }
+            foreach(var color in liquidColors) if(!counts.ContainsKey(color) || counts[color]!=capacity) return false;
+            for(int i=0;i<tubes.Count;i++) tubes[i].FillTube(board.tubes[i].colors);
+            CheckGameOver();return true;
+        } catch(System.Exception) {return false;}
+    }
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        if(RestoreBoard()) return;
         // 第一步：准备液体数据，每个颜色出现 capacity 次（这里为4次）
         List<Color> liquidPool = new List<Color>();
         foreach (Color c in liquidColors)
@@ -61,6 +89,7 @@ public class gm2 : MonoBehaviour
         {
             tubes[i].ClearTube();  // 可在 TubeController 中实现清空功能
         }
+        SaveBoard();
         //Debug.Log("液体池数量：" + liquidPool.Count);
         //Debug.Log("瓶子数量：" + tubes.Count);
     }
@@ -79,7 +108,8 @@ public class gm2 : MonoBehaviour
             tube.ClearTube();
         }
 
-        // 重新初始化游戏
+        // Reset deliberately starts a new board rather than restoring it.
+        PlayerPrefs.DeleteKey(SaveKey);
         Start();
 
         HidePanel();
